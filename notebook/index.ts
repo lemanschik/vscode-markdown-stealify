@@ -1,5 +1,5 @@
 import type * as MarkdownIt from 'markdown-it';
-import mermaid from 'mermaid';
+
 import type { RendererContext } from 'vscode-notebook-renderer';
 import { renderMermaidBlocksInElement } from '../markdownPreview/mermaid';
 import { extendMarkdownItWithMermaid } from '../src/mermaid';
@@ -13,12 +13,6 @@ export async function activate(ctx: RendererContext<void>) {
     if (!markdownItRenderer) {
         throw new Error(`Could not load 'vscode.markdown-it-renderer'`);
     }
-
-    const config = {
-        startOnLoad: false,
-        theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast') ? 'dark' : 'default'
-    };
-    mermaid.initialize(config);
 
     markdownItRenderer.extendMarkdownIt((md: MarkdownIt) => {
         extendMarkdownItWithMermaid(md, { languageIds: () => ['mermaid'] });
