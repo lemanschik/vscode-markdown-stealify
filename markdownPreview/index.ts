@@ -1,2 +1,2 @@
 
-import from './stealify.ts';
+import from './stealify.js';
