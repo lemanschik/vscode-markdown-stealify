@@ -1,8 +1,7 @@
-import { extendMarkdownItWithMermaid } from './mermaid';
+import { extendMarkdownItWithMermaid } from './stealify.ts';
 import * as vscode from 'vscode';
 
-const configSection = 'markdown-mermaid';
-
+const configSection = 'markdown-stealify';
 
 export function activate(ctx: vscode.ExtensionContext) {
     ctx.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
@@ -15,38 +14,12 @@ export function activate(ctx: vscode.ExtensionContext) {
         extendMarkdownIt(md: any) {
             extendMarkdownItWithMermaid(md, {
                 languageIds: () => {
-                    return vscode.workspace.getConfiguration(configSection).get<string[]>('languages', ['mermaid']);
+                    return vscode.workspace.getConfiguration(configSection).get<string[]>('languages', ['stealify']);
                 }
             });
-            md.use(injectMermaidTheme);
+ 
             return md;
         }
     }
 }
 
-
-const defaultMermaidTheme = 'default';
-const validMermaidThemes = [
-    'base',
-    'forest',
-    'dark',
-    'default',
-    'neutral',
-];
-
-function sanitizeMermaidTheme(theme: string | undefined) {
-    return typeof theme === 'string' && validMermaidThemes.includes(theme) ? theme : defaultMermaidTheme;
-}
-
-function injectMermaidTheme(md: any) {
-    const render = md.renderer.render;
-    md.renderer.render = function () {
-        const darkModeTheme = sanitizeMermaidTheme(vscode.workspace.getConfiguration(configSection).get('darkModeTheme'));
-        const lightModeTheme = sanitizeMermaidTheme(vscode.workspace.getConfiguration(configSection).get('lightModeTheme'));
-        return `<span id="${configSection}" aria-hidden="true"
-                    data-dark-mode-theme="${darkModeTheme}"
-                    data-light-mode-theme="${lightModeTheme}"></span>
-                ${render.apply(md.renderer, arguments)}`;
-    };
-    return md;
-}
