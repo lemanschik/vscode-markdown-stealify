@@ -1,6 +1,6 @@
 import * as mdItContainer from 'markdown-it-container';
 
-const pluginKeyword = 'mermaid';
+const pluginKeyword = 'stealify';
 const tokenTypeInline = 'inline';
 const ttContainerOpen = 'container_' + pluginKeyword + '_open';
 const ttContainerClose = 'container_' + pluginKeyword + '_close';
@@ -36,9 +36,9 @@ export function extendMarkdownItWithMermaid(md: any, config: { languageIds(): re
             }
 
             if (token.nesting === 1) {
-                return `<div class="${pluginKeyword}">${preProcess(src)}`;
+                return `<${pluginKeyword}-element>${src}`;
             } else {
-                return '</div>';
+                return '</${pluginKeyword}-element>';
             }
         }
     });
@@ -46,20 +46,12 @@ export function extendMarkdownItWithMermaid(md: any, config: { languageIds(): re
     const highlight = md.options.highlight;
     md.options.highlight = (code: string, lang: string) => {
         const reg = new RegExp('\\b(' + config.languageIds().map(escapeRegExp).join('|') + ')\\b', 'i');
-        if (lang && reg.test(lang)) {
-            return `<pre style="all:unset;"><div class="${pluginKeyword}">${preProcess(code)}</div></pre>`;
+        if (lang && reg.test(lang === 'stealify' ? 'ts' : lang)) {
+            return `<pre style="all:unset;"><div class="${pluginKeyword}">${code}</div></pre>`;
         }
         return highlight(code, lang);
     };
     return md;
-}
-
-function preProcess(source: string): string {
-    return source
-        .replace(/\</g, '&lt;')
-        .replace(/\>/g, '&gt;')
-        .replace(/\n+$/,'')
-        .trimStart();
 }
 
 function escapeRegExp(string: string): string {
